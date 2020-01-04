@@ -3,12 +3,15 @@ import gameOfLife from './gameOfLife';
 (function(){
     const body = document.querySelector('body');
     const canvas = document.createElement('canvas');
+    const randomize = document.createElement('button');
+    randomize.textContent = 'randomize'
     const seedRange = document.createElement('input');
     seedRange.type = 'range';
     const speedRange = document.createElement('input');
     speedRange.type = 'range';
     const controls = {
         canvas,
+        randomize,
         seedRange,
         speedRange,
     };
@@ -28,7 +31,7 @@ import gameOfLife from './gameOfLife';
         mainContainer.appendChild(container);
     })
 
-    document.body.appendChild(mainContainer);
+    body.appendChild(mainContainer);
 
     gameOfLife(controls);
 })()

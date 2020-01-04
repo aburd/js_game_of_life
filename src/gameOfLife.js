@@ -1,6 +1,6 @@
-const WIDTH = 64;
-const HEIGHT = 64;
-const CELL_SIZE = 8;
+const WIDTH = 512;
+const HEIGHT = 512;
+const CELL_SIZE = 2;
 const CELL_ALIVE_STROKE = '#77ccaa';
 const CELL_DEAD_STROKE = '#FFFFFF';
 const colors = [CELL_DEAD_STROKE, CELL_ALIVE_STROKE]
@@ -17,14 +17,20 @@ class Universe {
     constructor() {
         this.width = WIDTH;
         this.height = HEIGHT;
-        this.cells = this.createCells();
+        this.oldCells = null;
+        this.cells = this.randomCells();
     }
 
     createCells(seed = 2) {
-        let newCells = new Array(this.width * this.height)
+        return new Array(this.width * this.height)
             .fill(null)
             .map((_, i) => i % seed ? Cell.Alive : Cell.Dead);
-        return newCells
+    }
+    
+    randomCells() {
+        return new Array(this.width * this.height)
+            .fill(null)
+            .map((_, i) => Math.random() > 0.5 ? Cell.Alive : Cell.Dead);
     }
 
     getCellIndex(row, col) {
@@ -49,6 +55,7 @@ class Universe {
                 newCells[idx] = this.rules(this.cells[idx], neighbors);
             }
         }
+        this.oldCells = this.cells;
         this.cells = newCells;
     }
 
@@ -94,13 +101,16 @@ function drawCells(universe, ctx) {
         for(let col = 0; col < universe.width; col++) {
             const idx = universe.getCellIndex(row, col);
             const cell = universe.cells[idx]
-            ctx.fillStyle = colors[cell];
-            ctx.fillRect(
-                col * (CELL_SIZE + BORDER) + BORDER,
-                row * (CELL_SIZE + BORDER) + BORDER,
-                CELL_SIZE,
-                CELL_SIZE,
-            )
+            const changed = universe.oldCells && universe.oldCells[idx] !== cell
+            if(changed) {
+                ctx.fillStyle = colors[cell];
+                ctx.fillRect(
+                    col * (CELL_SIZE + BORDER) + BORDER,
+                    row * (CELL_SIZE + BORDER) + BORDER,
+                    CELL_SIZE,
+                    CELL_SIZE,
+                )
+            }
         }
     }
 
@@ -130,6 +140,7 @@ export default function({
     canvas,
     seedRange,
     speedRange,
+    randomize,
  }) {
     const universe = new Universe();
     canvas.width = universe.width * (CELL_SIZE + BORDER) + BORDER;
@@ -147,6 +158,11 @@ export default function({
         framerate = (ev.target.value / 100) * MAX_FRAMERATE
     }
     speedRange.addEventListener('input', changeSpeed)
+    function handleRandomize() {
+        universe.cells = universe.randomCells();
+        drawCells(universe, ctx);
+    }
+    randomize.addEventListener('click', handleRandomize)
     
     // Loop
     drawGrid(universe, ctx);
