@@ -1,0 +1,1 @@
+Conways Game of Life implemented in pure JS and Canvas.
