@@ -17,7 +17,7 @@ class Universe {
     constructor() {
         this.width = WIDTH;
         this.height = HEIGHT;
-        this.oldCells = null;
+        this.oldCells = [];
         this.cells = this.randomCells();
     }
 
@@ -101,7 +101,7 @@ function drawCells(universe, ctx) {
         for(let col = 0; col < universe.width; col++) {
             const idx = universe.getCellIndex(row, col);
             const cell = universe.cells[idx]
-            const changed = universe.oldCells && universe.oldCells[idx] !== cell
+            const changed = universe.oldCells[idx] !== cell
             if(changed) {
                 ctx.fillStyle = colors[cell];
                 ctx.fillRect(
